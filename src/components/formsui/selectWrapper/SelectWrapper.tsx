@@ -1,13 +1,11 @@
-import { TextField, MenuItems } from "@mui/material";
+import { TextField, MenuItem, TextFieldProps } from "@mui/material";
 import { useField, useFormikContext } from "formik";
 
 interface SelectWrapperProps {
   name: string;
-  options: Record<string, any>[];
-  select?: boolean;
-  variant?: "outlined" | "filled" | "standard ";
-  fullWidth?: "true" | "false";
+  options: any;
   label?: string;
+
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 
   // ...otherProps
@@ -16,9 +14,6 @@ interface SelectWrapperProps {
 const SelectWrapper = ({
   name,
   options,
-  select,
-  variant,
-  fullWidth,
   label,
   onChange,
   ...otherProps
@@ -29,17 +24,30 @@ const SelectWrapper = ({
     setFieldValue(name, value);
   };
   const [field, meta] = useField(name);
-  const configSelect = {
+  const configSelect: TextFieldProps = {
     ...field,
     ...otherProps,
-    select: select ?? true,
-    variant: variant ?? "outlined",
-    fullWidth: fullWidth ?? "true",
-    label: label ?? "",
+    select: true,
+    size: "small",
+    label,
+    variant: "outlined",
+    fullWidth: true,
     onChange: handleOnchange,
   };
 
-  return <TextField />;
+  if (meta && meta.touched && meta.error) {
+    configSelect.error = true;
+    configSelect.helperText = meta.error;
+  }
+  return (
+    <TextField {...configSelect}>
+      {Object.keys(options).map((option: any, key: number) => (
+        <MenuItem key={key} value={option}>
+          {options[option]}
+        </MenuItem>
+      ))}
+    </TextField>
+  );
 };
 
 export default SelectWrapper;
